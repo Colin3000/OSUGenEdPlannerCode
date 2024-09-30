@@ -1,17 +1,18 @@
-import Popup from 'reactjs-popup';
-import SearchBar from './SearchBar.jsx';
+import CourseLookupPage from './CourseLookupPage.jsx';
+import { useState } from 'react';
+import { createPortal } from 'react-dom';
 
 function CourseSelection({ CourseType }) {
-    const CourseLookupPage = () => (
-        <Popup trigger={<button className="button"> 🔎 </button>} modal nested>
-          <span> Modal content </span>
-        </Popup>
-      );
+    const [showModal, setShowModal] = useState(false);
     return (
         <tr className='CourseRow'>
             <td><p>{CourseType}</p></td>
-            <td className="SearchBar"><SearchBar /></td> 
-            <td>{CourseLookupPage()}</td>
+            <td className="SearchBar"><input type="text" /></td> 
+            <td><button onClick={() => setShowModal(true)}>🔎</button></td>
+            {showModal && createPortal(
+                <CourseLookupPage onClose={() => setShowModal(false)} CourseType={CourseType}/>,
+                document.body
+            )}
         </tr>
     );
 }
