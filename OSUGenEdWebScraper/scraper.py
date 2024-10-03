@@ -24,28 +24,46 @@ for attribute in courseAttributes:
     driver.find_element(By.NAME, "OSR_CAT_SRCH_WK_BUTTON1").click()
     wait = WebDriverWait(driver, 10)
     time.sleep(1)
+    #Check if the courses loaded has more than 1 page
     isPresent = driver.find_elements(By.ID, "OSR_CAT_SRCH_WK_BUTTON_FORWARD")
+    #Don't look for a forward buttton if there is only one page
     if len(isPresent) == 0:
+        #Waits until a course loads
         wait.until(EC.presence_of_element_located((By.ID, "OSR_CAT_SRCH_OSR_CRSE_HEADER$0")))
+        #Gets all the courses
         courseTitles = driver.find_elements(By.CLASS_NAME, "PSQRYTITLE")
         courseTitles.pop(0)
+        courseDescriptions = driver.find_elements(By.CLASS_NAME, "PSLONGEDITBOX")
         for title in courseTitles:
             print(title.text)
+        for description in courseDescriptions:
+            print(description.text)
+        numCoursesOnPage = int(courseDescriptions[-1].get_attribute("id")[-2:])
+        for unitIndex in range(numCoursesOnPage):
+            idToSearch = "OSR_CAT_SRCH_OSR_UNITS_DESCR$" + str(unitIndex)
+            print(driver.find_element(By.ID, idToSearch).text)
+
     else:
         wait.until(EC.presence_of_element_located((By.ID, "OSR_CAT_SRCH_WK_BUTTON_FORWARD")))
         onceMore = iter([True, False])
         while driver.find_element(By.ID, "OSR_CAT_SRCH_WK_BUTTON_FORWARD").is_enabled() or next(onceMore):
-            #Waits until a course loads
             wait.until(EC.presence_of_element_located((By.ID, "OSR_CAT_SRCH_OSR_CRSE_HEADER$0")))
-            #Gets all the courses
             courseTitles = driver.find_elements(By.CLASS_NAME, "PSQRYTITLE")
-            #Gets rid of the header
             courseTitles.pop(0)
+            courseDescriptions = driver.find_elements(By.CLASS_NAME, "PSLONGEDITBOX")
             for title in courseTitles:
                 print(title.text)
+            for description in courseDescriptions:
+                print(description.text)
+            numCoursesOnPage = int(courseDescriptions[-1].get_attribute("id")[-2:])
+            for unitIndex in range(numCoursesOnPage):
+                idToSearch = "OSR_CAT_SRCH_OSR_UNITS_DESCR$" + str(unitIndex)
+                print(driver.find_element(By.ID, idToSearch).text)
+            #Finds and clicks the next page button
             driver.find_element(By.ID, "OSR_CAT_SRCH_WK_BUTTON_FORWARD").click()
             time.sleep(1)
             wait.until(EC.presence_of_element_located((By.ID, "OSR_CAT_SRCH_WK_BUTTON_FORWARD")))
+    #Go back to the course attribute page
     time.sleep(1)
     wait.until(EC.presence_of_element_located((By.ID, "OSR_CAT_SRCH_WK_HYPERLINK")))
     driver.find_element(By.ID, "OSR_CAT_SRCH_WK_HYPERLINK").click()
