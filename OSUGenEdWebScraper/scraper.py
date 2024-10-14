@@ -6,7 +6,6 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import json
-
 #Initalizes dictionary to later export as json
 genCourseData = {}
 chrome_options = Options() 
@@ -40,6 +39,7 @@ for attribute in courseAttributes:
     isPresent = driver.find_elements(By.ID, "OSR_CAT_SRCH_WK_BUTTON_FORWARD")
     #Don't look for a forward buttton if there is only one page
     if len(isPresent) == 0:
+        time.sleep(1)
         #Waits until a course loads
         wait.until(EC.presence_of_element_located((By.ID, "OSR_CAT_SRCH_OSR_CRSE_HEADER$0")))
         #Gets course titles
@@ -50,25 +50,31 @@ for attribute in courseAttributes:
         courseTitles.pop(0)
         #Gets course descriptions
         courseDescriptions = driver.find_elements(By.CLASS_NAME, "PSLONGEDITBOX")
-        #Gets the number of courses through course descriptions array
+        #Gets the number of courses through course descriptions list. 
+        #The course descriptions list will have double the elements than normal due to the website's formatting. 
+        #However, the last element in the list will always show the number of courses
         numCoursesOnPage = courseDescriptions[-1].get_attribute("id")[-2:]
         if (not numCoursesOnPage.isnumeric()):
             numCoursesOnPage = courseDescriptions[-1].get_attribute("id")[-1:]
         numCoursesOnPage = int(numCoursesOnPage)
-        #Converts course description elements to text
-        courseDescriptions = [element.text for element in courseDescriptions]
+        #Creates a list to get the text of course units
         courseUnits = []
-        #Finds the number of units in course
-        for unitIndex in range(1, numCoursesOnPage + 1):
+        #Creates a list to get the text of course descriptions
+        courseDescriptionsText = []
+        #Finds the number of units and descriptions in each course
+        for unitIndex in range(0, numCoursesOnPage + 1):
             idToSearch = "OSR_CAT_SRCH_OSR_UNITS_DESCR$" + str(unitIndex)
             courseUnits.append(driver.find_element(By.ID, idToSearch).text)
+            idToSearch = "OSR_CAT_SRCH_DESCRLONG$" + str(unitIndex)
+            courseDescriptionsText.append(driver.find_element(By.ID, idToSearch).text)
         #Adds course data to courseInfo
-        courseInfo = [{"Title": t, "Description": d, "Units": u} for t, d, u in zip(courseTitles, courseDescriptions, courseUnits)]
+        courseInfo = [{"Title": t, "Description": d, "Units": u} for t, d, u in zip(courseTitles, courseDescriptionsText, courseUnits)]
     else:
         wait.until(EC.presence_of_element_located((By.ID, "OSR_CAT_SRCH_WK_BUTTON_FORWARD")))
         onceMore = iter([True, False])
         #Loop to go through pages as long as the forward button is enabled + one extra iteration
         while driver.find_element(By.ID, "OSR_CAT_SRCH_WK_BUTTON_FORWARD").is_enabled() or next(onceMore):
+            time.sleep(1)
             wait.until(EC.presence_of_element_located((By.ID, "OSR_CAT_SRCH_OSR_CRSE_HEADER$0")))
             courseTitles = driver.find_elements(By.CLASS_NAME, "PSQRYTITLE")
             courseTitles = [element.text for element in courseTitles]
@@ -78,13 +84,15 @@ for attribute in courseAttributes:
             if (not numCoursesOnPage.isnumeric()):
                 numCoursesOnPage = courseDescriptions[-1].get_attribute("id")[-1:]
             numCoursesOnPage = int(numCoursesOnPage)
-            courseDescriptions = [element.text for element in courseDescriptions]
             courseUnits = []
-            for unitIndex in range(1, numCoursesOnPage + 1):
+            courseDescriptionsText = []
+            for unitIndex in range(0, numCoursesOnPage + 1):
                 idToSearch = "OSR_CAT_SRCH_OSR_UNITS_DESCR$" + str(unitIndex)
                 courseUnits.append(driver.find_element(By.ID, idToSearch).text)
+                idToSearch = "OSR_CAT_SRCH_DESCRLONG$" + str(unitIndex)
+                courseDescriptionsText.append(driver.find_element(By.ID, idToSearch).text)
             #Adds course data of current page and adds to courseInfo
-            currentPageInfo = [{"Title": t, "Description": d, "Units": u} for t, d, u in zip(courseTitles, courseDescriptions, courseUnits)]
+            currentPageInfo = [{"Title": t, "Description": d, "Units": u} for t, d, u in zip(courseTitles, courseDescriptionsText, courseUnits)]
             courseInfo = courseInfo + currentPageInfo
             #Finds and clicks the next page button
             driver.find_element(By.ID, "OSR_CAT_SRCH_WK_BUTTON_FORWARD").click()
