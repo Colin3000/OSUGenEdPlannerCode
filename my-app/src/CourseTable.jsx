@@ -2,6 +2,10 @@ import CourseLookupPage from './CourseLookupPage.jsx';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 
+fetch('https://github.com/Colin3000/OSUGenEdPlanner/blob/main/GECourseData.json')
+    .then((response) => response.json())
+    .then((data) => console.log(data));
+
 function CourseSelection({ CourseType }) {
     const [showModal, setShowModal] = useState(false);
     return (
