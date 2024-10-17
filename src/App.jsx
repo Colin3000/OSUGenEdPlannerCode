@@ -15,7 +15,14 @@ function Planner(){
     "Mathematical and Quantitative Reasoning"
     ];
   const themesList = [
-    "Citizenship for a Diverse and Just World"
+    "Citizenship for a Diverse and Just World",
+    "Lived Environments",
+    "Health and Well-being",
+    "Sustainability",
+    "Traditions, Cultures, and Transformations",
+    "Number, Nature, Mind",
+    "Origins and Evolution",
+    "Migration, Mobility, and Immobility"
   ];
   return (
     <div>

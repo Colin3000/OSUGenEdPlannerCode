@@ -10,7 +10,7 @@
 .Bookend {
   border: 1px solid black;
   margin-top: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   margin-right: 50px;
   padding: 5px 5px 5px 5px;
 }
@@ -29,6 +29,7 @@ table {
 
 th {
   text-align: left;
+  font-size: 30px;
 }
 
 .modal-overlay {
@@ -56,4 +57,11 @@ th {
   right: 5px;
   font-weight: bold;
   font-size: 20px;
+}
+
+#SpecialRowHeader {
+  font-weight: bold;
+}
+.SpecialRow {
+  padding-top: 16px;
 }
